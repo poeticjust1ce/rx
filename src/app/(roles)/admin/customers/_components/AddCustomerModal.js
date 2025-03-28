@@ -1,0 +1,49 @@
+"use client";
+
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { PiPlus } from "react-icons/pi";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import CustomerForm from "./CustomerForm";
+import { createCustomer } from "../_actions/actions";
+import { toast } from "@/hooks/use-toast";
+
+export default function AddCustomerModal() {
+  const [isOpen, setIsOpen] = useState(false);
+
+  const handleCreate = async (formData) => {
+    try {
+      await createCustomer(formData);
+      setIsOpen(false);
+      window.location.reload();
+    } catch (error) {
+      toast({
+        title: "Error creating customer",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  };
+
+  return (
+    <>
+      <Button onClick={() => setIsOpen(true)}>
+        Add Customer <PiPlus className="ml-2" />
+      </Button>
+
+      <Dialog open={isOpen} onOpenChange={setIsOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Add New Customer</DialogTitle>
+          </DialogHeader>
+          <CustomerForm action={handleCreate} />
+        </DialogContent>
+      </Dialog>
+    </>
+  );
+}

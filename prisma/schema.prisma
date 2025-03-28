@@ -1,0 +1,218 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id          String  @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  email       String  @unique
+  password    String
+  role        Role    @default(user)
+  isActivated Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  managerId         String?      @db.ObjectId
+  activities        Activity[]
+  team              User[]       @relation("ManagedUsers")
+  sessions          Session[]
+  accounts          Account[]
+  attendance        Attendance[]
+  inventory         Inventory?
+  sentTransfers     Transfer[]   @relation("SenderTransfers")
+  receivedTransfers Transfer[]   @relation("ReceiverTransfers")
+  manager           User?        @relation("ManagedUsers", fields: [managerId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  Delivery          Delivery[]
+}
+
+model Transfer {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  status    TransferStatus @default(pending)
+  remarks   String?
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+
+  //relations
+  productId  String        @db.ObjectId
+  product    InventoryItem @relation(fields: [productId], references: [id], onDelete: Cascade)
+  senderId   String        @db.ObjectId
+  sender     User          @relation("SenderTransfers", fields: [senderId], references: [id])
+  receiverId String        @db.ObjectId
+  receiver   User          @relation("ReceiverTransfers", fields: [receiverId], references: [id])
+  quantity   Int
+}
+
+model Inventory {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  // owner of inventory
+  userId String @unique @db.ObjectId
+  user   User   @relation(fields: [userId], references: [id])
+  //
+
+  isAdminInventory Boolean @default(false)
+
+  items     InventoryItem[]
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @updatedAt
+}
+
+model InventoryItem {
+  id       String @id @default(auto()) @map("_id") @db.ObjectId
+  name     String
+  quantity Int
+
+  batchNumber    String?
+  expirationDate String?
+  transfer       Transfer[]
+
+  // relations
+  inventoryId String    @db.ObjectId
+  inventory   Inventory @relation(fields: [inventoryId], references: [id])
+  supplierId  String    @db.ObjectId
+  supplier    Supplier  @relation(fields: [supplierId], references: [id])
+
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  DeliveryItem DeliveryItem[]
+}
+
+model Supplier {
+  id      String  @id @default(auto()) @map("_id") @db.ObjectId
+  name    String
+  phone   String?
+  email   String?
+  address String?
+
+  products InventoryItem[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Customer {
+  id        String     @id @default(auto()) @map("_id") @db.ObjectId
+  name      String
+  location  String
+  createdAt DateTime?  @default(now())
+  updatedAt DateTime?  @updatedAt
+  Delivery  Delivery[]
+}
+
+model Attendance {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  timeIn    DateTime  @default(now())
+  timeOut   DateTime?
+  photoUrl  String?
+  location  String?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  // relations
+
+  userId String @db.ObjectId
+  user   User   @relation(fields: [userId], references: [id])
+}
+
+model Account {
+  id                String  @id @default(auto()) @map("_id") @db.ObjectId
+  userId            String  @db.ObjectId
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.String
+  access_token      String? @db.String
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.String
+  session_state     String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  sessionToken String   @unique
+  userId       String   @db.ObjectId
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model VerificationToken {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  identifier String
+  token      String
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+enum Role {
+  admin
+  manager
+  user
+}
+
+enum TransferStatus {
+  pending
+  accepted
+  rejected
+}
+
+model Activity {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  type      String
+  message   String
+  timestamp DateTime @default(now())
+  userId    String   @db.ObjectId
+  user      User     @relation(fields: [userId], references: [id])
+}
+
+model Delivery {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  deliveryDate  DateTime
+  orNumber      String?
+  invoiceNumber String?
+  remarks       String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // Relations
+  customerId  String         @db.ObjectId
+  customer    Customer       @relation(fields: [customerId], references: [id])
+  items       DeliveryItem[]
+  deliveredBy String         @db.ObjectId
+  user        User           @relation(fields: [deliveredBy], references: [id])
+}
+
+model DeliveryItem {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  quantity  Int      @default(1)
+  notes     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  delivery   Delivery @relation(fields: [deliveryId], references: [id])
+  deliveryId String   @db.ObjectId
+
+  product   InventoryItem @relation(fields: [productId], references: [id])
+  productId String        @db.ObjectId
+}
