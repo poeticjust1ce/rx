@@ -1,23 +1,8 @@
 import React from "react";
 import { DataTable } from "@/components/table/DataTable";
 import { columns } from "./columns";
-import prisma from "@/lib/prisma";
-import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
-import AddUserModal from "./_components/AddUserModal";
 
-const getUsers = async () => {
-  return await prisma.user.findMany({
-    orderBy: { createdAt: "desc" },
-    include: {
-      manager: {
-        select: {
-          name: true,
-        },
-      },
-    },
-  });
-};
+import { getUsers } from "./actions/actions";
 
 export default async function UsersPage() {
   const users = await getUsers();
@@ -33,7 +18,6 @@ export default async function UsersPage() {
             Manage all system users and their permissions
           </p>
         </div>
-        <AddUserModal />
       </div>
 
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow">
