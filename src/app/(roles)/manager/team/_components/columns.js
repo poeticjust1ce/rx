@@ -51,7 +51,7 @@ export const columns = [
           await removeFromTeam(user.id);
           toast({
             title: "Success",
-            description: `${user.name} has been removed from your team`,
+            description: `${user.name} has been removed from the team`,
           });
         } catch (error) {
           toast({
