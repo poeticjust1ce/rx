@@ -431,7 +431,7 @@ export default function CheckInOutButton({ userId }) {
         </div>
       ) : (
         <div className="text-center text-gray-500 py-4">
-          No attendance records found
+          No attendance records found.
         </div>
       )}
     </div>
