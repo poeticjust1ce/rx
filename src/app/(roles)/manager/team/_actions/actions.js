@@ -95,3 +95,15 @@ export async function updateTeamMember(formData) {
     },
   });
 }
+
+export async function removeFromTeam(userId) {
+  const session = await auth();
+  if (!session) throw new Error("Unauthorized");
+
+  return await prisma.user.update({
+    where: { id: userId },
+    data: {
+      managerId: null,
+    },
+  });
+}

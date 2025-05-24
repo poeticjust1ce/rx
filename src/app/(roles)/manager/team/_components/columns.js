@@ -1,4 +1,3 @@
-// src/app/(roles)/manager/my-team/_components/columns.jsx
 "use client";
 
 import { Button } from "@/components/ui/button";
@@ -9,7 +8,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { EditTeamMemberModal } from "./EditTeamMemberModal";
+import { useToast } from "@/hooks/use-toast";
+import { removeFromTeam } from "../_actions/actions";
 
 export const columns = [
   {
@@ -44,6 +44,23 @@ export const columns = [
     id: "actions",
     cell: ({ row }) => {
       const user = row.original;
+      const { toast } = useToast();
+
+      const handleRemove = async () => {
+        try {
+          await removeFromTeam(user.id);
+          toast({
+            title: "Success",
+            description: `${user.name} has been removed from your team`,
+          });
+        } catch (error) {
+          toast({
+            title: "Error",
+            description: error.message,
+            variant: "destructive",
+          });
+        }
+      };
 
       return (
         <DropdownMenu>
@@ -53,16 +70,11 @@ export const columns = [
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <EditTeamMemberModal user={user}>
-              <DropdownMenuItem>Edit</DropdownMenuItem>
-            </EditTeamMemberModal>
             <DropdownMenuItem
-              onClick={async () => {
-                // Move the deactivate logic here or call a client-side function
-                console.log("Deactivate/Activate", user.id);
-              }}
+              onClick={handleRemove}
+              className="text-red-600 focus:text-red-600"
             >
-              {user.isActivated ? "Deactivate" : "Activate"}
+              Remove from team
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
