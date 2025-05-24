@@ -1,9 +1,7 @@
-// src/app/(roles)/manager/my-team/_actions/actions.js
 "use server";
 import prisma from "@/lib/prisma";
 import { auth } from "@/lib/auth";
 
-// Get current manager's team
 export async function getMyTeam() {
   const session = await auth();
   if (!session) throw new Error("Unauthorized");
@@ -26,18 +24,36 @@ export async function getAvailableUsers() {
   const session = await auth();
   if (!session) throw new Error("Unauthorized");
 
-  return await prisma.user.findMany({
-    where: {
-      managerId: null,
-      id: { not: session.user.id },
-      role: "user",
-    },
-    select: {
-      id: true,
-      name: true,
-      email: true,
-    },
-  });
+  try {
+    // 1. First get ALL users from the database
+    const allUsers = await prisma.user.findMany({
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true,
+        managerId: true,
+      },
+    });
+
+    console.log("All users from DB:", allUsers);
+
+    // 2. Filter manually in JavaScript
+    const availableUsers = allUsers.filter((user) => {
+      const isRegularUser = user.role === "user";
+      const hasNoManager =
+        user.managerId === null || user.managerId === undefined;
+      const isNotCurrentUser = user.id !== session.user.id;
+
+      return isRegularUser && hasNoManager && isNotCurrentUser;
+    });
+
+    console.log("Filtered available users:", availableUsers);
+    return availableUsers;
+  } catch (error) {
+    console.error("Error in getAvailableUsers:", error);
+    throw error;
+  }
 }
 
 export async function assignToTeam(userId) {
@@ -47,34 +63,6 @@ export async function assignToTeam(userId) {
   return await prisma.user.update({
     where: { id: userId },
     data: {
-      managerId: session.user.id,
-      isActivated: true,
-    },
-  });
-}
-
-export async function addTeamMember(formData) {
-  const session = await auth();
-  if (!session) throw new Error("Unauthorized");
-
-  const { name, email, role, password } = Object.fromEntries(formData);
-
-  const existingUser = await prisma.user.findUnique({
-    where: { email },
-  });
-
-  if (existingUser) {
-    throw new Error("User with this email already exists");
-  }
-
-  const hashedPassword = await bcrypt.hash(password, 10);
-
-  return await prisma.user.create({
-    data: {
-      name,
-      email,
-      role,
-      password: hashedPassword,
       managerId: session.user.id,
       isActivated: true,
     },

@@ -1,4 +1,3 @@
-// src/app/(roles)/manager/my-team/_components/SelectUserModal.jsx
 "use client";
 
 import { Button } from "@/components/ui/button";
@@ -52,7 +51,7 @@ export function SelectUserModal({ children, refresh }) {
       await assignToTeam(selectedUser.id);
       toast({ title: "User added to your team successfully" });
       setOpen(false);
-      refresh(); // Trigger parent to refresh data
+      refresh();
     } catch (error) {
       toast({
         title: "Error",

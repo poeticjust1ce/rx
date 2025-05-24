@@ -1,4 +1,3 @@
-// src/app/(roles)/manager/my-team/page.jsx
 import { DataTable } from "@/components/table/DataTable";
 import { columns } from "./_components/columns";
 import { getMyTeam } from "./_actions/actions";
