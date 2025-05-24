@@ -22,7 +22,6 @@ export async function getMyTeam() {
   });
 }
 
-// Get available users without managers
 export async function getAvailableUsers() {
   const session = await auth();
   if (!session) throw new Error("Unauthorized");
@@ -30,8 +29,8 @@ export async function getAvailableUsers() {
   return await prisma.user.findMany({
     where: {
       managerId: null,
-      id: { not: session.user.id }, // Don't include self
-      role: "user", // Only regular users
+      id: { not: session.user.id },
+      role: "user",
     },
     select: {
       id: true,
@@ -41,7 +40,6 @@ export async function getAvailableUsers() {
   });
 }
 
-// Assign user to team
 export async function assignToTeam(userId) {
   const session = await auth();
   if (!session) throw new Error("Unauthorized");
@@ -61,7 +59,6 @@ export async function addTeamMember(formData) {
 
   const { name, email, role, password } = Object.fromEntries(formData);
 
-  // Check if user already exists
   const existingUser = await prisma.user.findUnique({
     where: { email },
   });
@@ -70,7 +67,6 @@ export async function addTeamMember(formData) {
     throw new Error("User with this email already exists");
   }
 
-  // Hash password
   const hashedPassword = await bcrypt.hash(password, 10);
 
   return await prisma.user.create({
@@ -91,11 +87,10 @@ export async function updateTeamMember(formData) {
 
   const { id, name, role } = Object.fromEntries(formData);
 
-  // Verify the user belongs to the current manager's team
   const existingUser = await prisma.user.findFirst({
     where: {
       id,
-      managerId: session.user.id, // Ensure user is part of manager's team
+      managerId: session.user.id,
     },
   });
 
