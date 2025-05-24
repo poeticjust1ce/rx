@@ -1,5 +1,8 @@
 "use client";
 
+import { ViewInventoryModal } from "./ViewInventoryModal";
+import { ViewDeliveriesModal } from "./ViewDeliveriesModal";
+import { Box, Package, UserX } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { MoreHorizontal } from "lucide-react";
 import {
@@ -48,11 +51,14 @@ export const columns = [
 
       const handleRemove = async () => {
         try {
-          await removeFromTeam(user.id);
-          toast({
-            title: "Success",
-            description: `${user.name} has been removed from the team`,
-          });
+          const response = await removeFromTeam(user.id);
+          if (response.success) {
+            toast({
+              title: "Success",
+              description: `${user.name} has been removed from your team`,
+            });
+            router.refresh();
+          }
         } catch (error) {
           toast({
             title: "Error",
@@ -70,12 +76,29 @@ export const columns = [
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuItem
-              onClick={handleRemove}
-              className="text-red-600 focus:text-red-600"
-            >
-              Remove from team
-            </DropdownMenuItem>
+            <ViewInventoryModal userId={user.id} userName={user.name}>
+              <DropdownMenuItem>
+                <Box className="mr-2 h-4 w-4" />
+                View Inventory
+              </DropdownMenuItem>
+            </ViewInventoryModal>
+
+            <ViewDeliveriesModal userId={user.id} userName={user.name}>
+              <DropdownMenuItem>
+                <Package className="mr-2 h-4 w-4" />
+                View Deliveries
+              </DropdownMenuItem>
+            </ViewDeliveriesModal>
+
+            <form action={handleRemove}>
+              <DropdownMenuItem
+                className="text-red-600 focus:text-red-600"
+                onSelect={(e) => e.preventDefault()}
+              >
+                <UserX className="mr-2 h-4 w-4" />
+                Remove from team
+              </DropdownMenuItem>
+            </form>
           </DropdownMenuContent>
         </DropdownMenu>
       );

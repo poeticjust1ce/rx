@@ -96,14 +96,102 @@ export async function updateTeamMember(formData) {
   });
 }
 
-export async function removeFromTeam(userId) {
+export async function removeFromTeam(formData) {
   const session = await auth();
   if (!session) throw new Error("Unauthorized");
 
-  return await prisma.user.update({
-    where: { id: userId },
-    data: {
-      managerId: null,
+  const userId = formData.get("userId");
+
+  try {
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { managerId: true },
+    });
+
+    if (!user) throw new Error("User not found");
+    if (user.managerId !== session.user.id)
+      throw new Error("Not authorized to remove this user");
+
+    await prisma.user.update({
+      where: { id: userId },
+      data: { managerId: null },
+    });
+
+    return { success: true, message: "User removed from team successfully" };
+  } catch (error) {
+    console.error("Remove from team error:", error);
+    throw error;
+  }
+}
+
+export async function getUserInventory(userId) {
+  const session = await auth();
+  if (!session) throw new Error("Unauthorized");
+
+  const inventory = await prisma.inventory.findUnique({
+    where: { userId },
+    include: {
+      items: {
+        include: {
+          supplier: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
+        },
+      },
     },
   });
+
+  return inventory?.items || [];
+}
+
+export async function getUserDeliveries(userId) {
+  const session = await auth();
+  if (!session) throw new Error("Unauthorized");
+
+  return await prisma.delivery.findMany({
+    where: {
+      deliveredBy: userId,
+    },
+    include: {
+      customer: true,
+      items: {
+        include: {
+          product: true,
+        },
+      },
+    },
+    orderBy: {
+      deliveryDate: "desc",
+    },
+  });
+}
+
+export async function generateInventoryReport(formData) {
+  const userId = formData.get("userId");
+  const userName = formData.get("userName");
+  const inventory = await getUserInventory(userId);
+
+  return {
+    type: "inventory",
+    userName,
+    data: inventory.map((item) => ({
+      ...item,
+      supplierName: item.supplier?.name || "N/A",
+    })),
+  };
+}
+
+export async function generateDeliveryReport(formData) {
+  const userId = formData.get("userId");
+  const userName = formData.get("userName");
+  const deliveries = await getUserDeliveries(userId);
+
+  return {
+    type: "deliveries",
+    userName,
+    data: deliveries,
+  };
 }
