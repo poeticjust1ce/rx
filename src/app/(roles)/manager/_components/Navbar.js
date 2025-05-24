@@ -3,13 +3,12 @@
 import * as Pi from "react-icons/pi";
 import {
   LayoutDashboard,
-  Pill,
   Users,
   ClipboardList,
-  UserCog,
   ChevronDown,
   ChevronUp,
   ArrowLeftRight,
+  ArrowRightToLine,
   CalendarCheck,
   Clock,
   Package,
@@ -84,9 +83,14 @@ const ManagerNavbar = () => {
       collapsible: true,
       items: [
         {
+          title: "My Transfers",
+          link: "/manager/transfers/my-transfers",
+          icon: ArrowLeftRight,
+        },
+        {
           title: "Transfer Products",
           link: "/manager/transfers",
-          icon: ArrowLeftRight,
+          icon: ArrowRightToLine,
         },
         {
           title: "Transfer History",

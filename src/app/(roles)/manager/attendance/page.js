@@ -1,11 +1,10 @@
-// src/app/(roles)/manager/attendance/page.jsx
 import { getTeamAttendance } from "./_actions/actions";
 import { TeamAttendanceTable } from "./_components/TeamAttendanceTable";
 import { AttendanceStatsCards } from "./_components/AttendanceStatsCards";
 import { DateRangePicker } from "./_components/DateRangePicker";
 
 export default async function TeamAttendancePage({ searchParams }) {
-  const { from, to } = searchParams;
+  const { from, to } = await searchParams;
   const attendanceData = await getTeamAttendance(from, to);
 
   return (
