@@ -34,13 +34,6 @@ export const metadata = {
     locale: "en_PH",
     type: "website",
   },
-  twitter: {
-    card: "summary",
-    title: "RX Global - Business Management System",
-    description: "Integrated inventory and attendance solution",
-    site: "@rxglobalsales", // Add if you have Twitter account
-  },
-  themeColor: "#1e3a8a", // Navy blue - change to your brand color
   icons: {
     icon: "/favicon.ico",
   },

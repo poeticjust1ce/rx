@@ -6,11 +6,9 @@ import { TeamStatsCards } from "./_components/TeamStatsCards";
 import { SelectUserModal } from "./_components/SelectUserModal";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
-
 export default async function MyTeamPage() {
   const teamMembers = await getMyTeam();
 
-  // This will be passed to the modal to refresh the data
   async function refreshData() {
     "use server";
     return await getMyTeam();

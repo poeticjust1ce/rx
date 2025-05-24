@@ -30,13 +30,14 @@ export default function CheckInOutButton({ userId }) {
   const [image, setImage] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [latestAttendance, setLatestAttendance] = useState(null);
+  const [facingMode, setFacingMode] = useState("user");
 
   useEffect(() => {
     async function fetchAttendance() {
       const attendance = await getLatestAttendance(userId);
       if (attendance) {
         setLatestAttendance(attendance);
-        setHasCheckedIn(!attendance.timeOut); // If no timeOut, user is still checked in
+        setHasCheckedIn(!attendance.timeOut);
         setAttendanceId(attendance.id);
       } else {
         setHasCheckedIn(false);
@@ -48,11 +49,11 @@ export default function CheckInOutButton({ userId }) {
 
   useEffect(() => {
     setCurrentTime(
-      moment().tz("Asia/Hong_Kong").format("📅 MMMM DD, YYYY 🕒 hh:mm:ss A")
+      moment().tz("Asia/Hong_Kong").format("MMMM DD, YYYY • hh:mm:ss A")
     );
     const interval = setInterval(() => {
       setCurrentTime(
-        moment().tz("Asia/Hong_Kong").format("📅 MMMM DD, YYYY 🕒 hh:mm:ss A")
+        moment().tz("Asia/Hong_Kong").format("MMMM DD, YYYY • hh:mm:ss A")
       );
     }, 1000);
     return () => clearInterval(interval);
@@ -60,14 +61,14 @@ export default function CheckInOutButton({ userId }) {
 
   const fetchLocation = () => {
     setIsLocationLoading(true);
-    setLocation("📍 Loading location...");
-    setLocationName("📍 Loading location...");
+    setLocation("Loading location...");
+    setLocationName("Loading location...");
 
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         async (position) => {
           const { latitude, longitude } = position.coords;
-          setLocation(`Lat: ${latitude}, Lng: ${longitude}`);
+          setLocation(`${latitude.toFixed(4)}, ${longitude.toFixed(4)}`);
 
           try {
             const res = await fetch(
@@ -76,25 +77,25 @@ export default function CheckInOutButton({ userId }) {
             const data = await res.json();
             setLocationName(data.display_name || "Unknown location");
           } catch (error) {
-            setLocationName("❌ Unable to fetch address");
+            setLocationName("Unable to fetch address");
           } finally {
             setIsLocationLoading(false);
           }
         },
         () => {
           setIsLocationLoading(false);
-          setLocationName("❌ Unable to fetch address");
+          setLocationName("Location access denied");
         }
       );
     } else {
       setIsLocationLoading(false);
-      setLocationName("❌ Geolocation not supported");
+      setLocationName("Geolocation not supported");
     }
   };
 
   useEffect(() => {
     if (isDrawerOpen) {
-      fetchLocation(); // 🔥 Auto-fetch location when drawer opens
+      fetchLocation();
     }
   }, [isDrawerOpen]);
 
@@ -107,7 +108,7 @@ export default function CheckInOutButton({ userId }) {
     e.preventDefault();
 
     if (!location || !image) {
-      toast.error("❌ Location and photo are required!");
+      toast.error("Location and photo are required!");
       return;
     }
 
@@ -122,17 +123,17 @@ export default function CheckInOutButton({ userId }) {
       const response = await checkInAttendance(formData);
 
       if (response?.success) {
-        toast.success("✅ Checked in successfully!");
+        toast.success("Checked in successfully!");
         setHasCheckedIn(true);
         setAttendanceId(response.attendance.id);
         setLatestAttendance(response.attendance);
-        setIsDrawerOpen(false); // ✅ Close the drawer after checking in
+        setIsDrawerOpen(false);
       } else {
-        toast.error(response?.message || "❌ Check-in failed.");
+        toast.error(response?.message || "Check-in failed.");
       }
     } catch (error) {
       console.error("Check-in error:", error);
-      toast.error("❌ Something went wrong.");
+      toast.error("Something went wrong.");
     } finally {
       setIsSubmitting(false);
     }
@@ -147,91 +148,291 @@ export default function CheckInOutButton({ userId }) {
       const response = await checkOutAttendance(attendanceId);
 
       if (response?.success) {
-        toast.success("✅ Checked out successfully!");
+        toast.success("Checked out successfully!");
         setHasCheckedIn(false);
         setLatestAttendance((prev) => ({ ...prev, timeOut: new Date() }));
       } else {
-        toast.error(response?.message || "❌ Check-out failed.");
+        toast.error(response?.message || "Check-out failed.");
       }
     } catch (error) {
       console.error("Check-out error:", error);
-      toast.error("❌ Something went wrong.");
+      toast.error("Something went wrong.");
     } finally {
       setIsSubmitting(false);
     }
   };
 
+  const switchCamera = () => {
+    setFacingMode((prevMode) => (prevMode === "user" ? "environment" : "user"));
+  };
+
   return (
-    <div className="flex flex-col items-center space-y-4">
-      <div className="text-lg font-semibold">{currentTime}</div>
-      <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
-        <DrawerTrigger asChild>
-          <Button variant="destructive" disabled={hasCheckedIn}>
-            Check In
-          </Button>
-        </DrawerTrigger>
-        <DrawerContent>
-          <DrawerHeader className="flex items-center justify-center">
-            <DrawerTitle>📸 Check In</DrawerTitle>
-          </DrawerHeader>
-          <div className="flex flex-col items-center space-y-4 p-4">
-            <Webcam
-              ref={webcamRef}
-              screenshotFormat="image/jpeg"
-              className="w-full max-w-sm rounded-lg border"
-            />
-            <Button variant="outline" onClick={captureImage}>
-              Capture Photo
+    <div className="max-w-md mx-auto bg-white rounded-xl shadow-md overflow-hidden p-6 space-y-6">
+      {/* Time Display */}
+      <div className="text-center">
+        <div className="text-sm font-medium text-gray-500">Current Time</div>
+        <div className="text-xl font-semibold text-gray-800 mt-1">
+          {currentTime}
+        </div>
+      </div>
+
+      {/* Action Buttons */}
+      <div className="flex flex-col space-y-4">
+        <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
+          <DrawerTrigger asChild>
+            <Button
+              variant={hasCheckedIn ? "outline" : "default"}
+              size="lg"
+              className="w-full py-6 text-lg"
+              disabled={hasCheckedIn}
+            >
+              {hasCheckedIn ? "Already Checked In" : "Check In"}
             </Button>
-            <div className="w-[80%] flex flex-col">
-              <p className="text-sm text-gray-500">🌍 {location}</p>
-              <p className="text-sm text-gray-200 font-semibold">
-                📍{" "}
-                {locationName ||
-                  (isLocationLoading ? "Loading..." : "No location")}
-              </p>
+          </DrawerTrigger>
+          <DrawerContent className="max-h-[90vh]">
+            <DrawerHeader>
+              <DrawerTitle className="text-center text-xl font-bold text-gray-800">
+                Check In Verification
+              </DrawerTitle>
+            </DrawerHeader>
+            <div className="px-6 pb-6 space-y-4 overflow-y-auto">
+              {/* Webcam Preview */}
+              <div className="relative">
+                <Webcam
+                  ref={webcamRef}
+                  screenshotFormat="image/jpeg"
+                  videoConstraints={{ facingMode }}
+                  className="w-full rounded-lg border shadow-sm"
+                />
+                {image && (
+                  <div className="absolute inset-0 border-4 border-green-500 rounded-lg pointer-events-none" />
+                )}
+              </div>
+
+              {/* Camera Controls */}
+              <div className="flex gap-3 justify-center">
+                <Button
+                  type="button"
+                  onClick={captureImage}
+                  variant="outline"
+                  className="flex items-center gap-2"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <circle cx="12" cy="12" r="10" />
+                    <circle cx="12" cy="12" r="4" />
+                  </svg>
+                  {image ? "Retake" : "Capture"}
+                </Button>
+                <Button
+                  type="button"
+                  onClick={switchCamera}
+                  variant="outline"
+                  className="flex items-center gap-2"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M12 20h7a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7M9 4H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h4" />
+                    <polyline points="16 16 12 12 16 8" />
+                    <line x1="12" y1="12" x2="21" y2="12" />
+                  </svg>
+                  Switch Camera
+                </Button>
+              </div>
+
+              {/* Location Information */}
+              <div className="bg-gray-50 p-4 rounded-lg space-y-2">
+                <div className="flex items-start gap-2">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="mt-0.5 text-gray-500"
+                  >
+                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+                    <circle cx="12" cy="10" r="3" />
+                  </svg>
+                  <div>
+                    <div className="text-sm font-medium text-gray-700">
+                      Coordinates
+                    </div>
+                    <div className="text-sm text-gray-600">{location}</div>
+                  </div>
+                </div>
+                <div className="flex items-start gap-2">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="mt-0.5 text-gray-500"
+                  >
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                  </svg>
+                  <div>
+                    <div className="text-sm font-medium text-gray-700">
+                      Address
+                    </div>
+                    <div className="text-sm text-gray-600">
+                      {isLocationLoading ? (
+                        <span className="inline-flex items-center gap-1">
+                          <svg
+                            className="animate-spin h-4 w-4 text-gray-500"
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                          >
+                            <circle
+                              className="opacity-25"
+                              cx="12"
+                              cy="12"
+                              r="10"
+                              stroke="currentColor"
+                              strokeWidth="4"
+                            ></circle>
+                            <path
+                              className="opacity-75"
+                              fill="currentColor"
+                              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                            ></path>
+                          </svg>
+                          Locating...
+                        </span>
+                      ) : (
+                        locationName
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Submit Button */}
+              <form onSubmit={handleCheckIn} className="w-full">
+                <Button
+                  type="submit"
+                  size="lg"
+                  className="w-full mt-2"
+                  disabled={
+                    isSubmitting ||
+                    isLocationLoading ||
+                    !locationName ||
+                    locationName.startsWith("Unable") ||
+                    !image
+                  }
+                >
+                  {isSubmitting ? (
+                    <span className="inline-flex items-center gap-2">
+                      <svg
+                        className="animate-spin h-4 w-4 text-white"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                      >
+                        <circle
+                          className="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                        ></circle>
+                        <path
+                          className="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                        ></path>
+                      </svg>
+                      Processing...
+                    </span>
+                  ) : (
+                    "Confirm Check In"
+                  )}
+                </Button>
+              </form>
             </div>
-            <form onSubmit={handleCheckIn}>
-              <Button
-                type="submit"
-                disabled={
-                  isSubmitting ||
-                  isLocationLoading ||
-                  !locationName ||
-                  locationName.startsWith("❌") ||
-                  !image
-                }
-              >
-                {isSubmitting ? "Checking In..." : "Confirm Check In"}
-              </Button>
-            </form>
-          </div>
-        </DrawerContent>
-      </Drawer>
-      <Button
-        variant="secondary"
-        onClick={handleCheckOut}
-        disabled={!hasCheckedIn || isSubmitting}
-      >
-        Check Out
-      </Button>
+          </DrawerContent>
+        </Drawer>
+
+        <Button
+          variant={hasCheckedIn ? "default" : "outline"}
+          size="lg"
+          className="w-full py-6 text-lg"
+          onClick={handleCheckOut}
+          disabled={!hasCheckedIn || isSubmitting}
+        >
+          {isSubmitting ? "Processing..." : "Check Out"}
+        </Button>
+      </div>
+
+      {/* Attendance Status */}
       {latestAttendance ? (
-        <div className="p-4 border rounded-lg bg-gray-800 text-white">
-          <p>
-            📅 Date: {moment(latestAttendance.timeIn).format("MMMM DD, YYYY")}
-          </p>
-          <p>⏰ Time In: {moment(latestAttendance.timeIn).format("hh:mm A")}</p>
-          {latestAttendance.timeOut ? (
-            <p>
-              ✅ Checked Out at:{" "}
-              {moment(latestAttendance.timeOut).format("hh:mm A")}
-            </p>
-          ) : (
-            <p>🚨 Currently Checked In</p>
-          )}
+        <div className="bg-gray-50 p-4 rounded-lg border border-gray-200 space-y-2">
+          <h3 className="font-semibold text-gray-800 text-center mb-2">
+            Latest Attendance
+          </h3>
+          <div className="grid grid-cols-2 gap-2 text-sm">
+            <div className="text-gray-600">Date:</div>
+            <div className="text-gray-800 font-medium">
+              {moment(latestAttendance.timeIn).format("MMMM DD, YYYY")}
+            </div>
+
+            <div className="text-gray-600">Time In:</div>
+            <div className="text-gray-800 font-medium">
+              {moment(latestAttendance.timeIn).format("hh:mm A")}
+            </div>
+
+            <div className="text-gray-600">Status:</div>
+            <div className="text-gray-800 font-medium">
+              {latestAttendance.timeOut ? (
+                <span className="text-green-600">Checked Out</span>
+              ) : (
+                <span className="text-blue-600">Currently Checked In</span>
+              )}
+            </div>
+
+            {latestAttendance.timeOut && (
+              <>
+                <div className="text-gray-600">Time Out:</div>
+                <div className="text-gray-800 font-medium">
+                  {moment(latestAttendance.timeOut).format("hh:mm A")}
+                </div>
+              </>
+            )}
+          </div>
         </div>
       ) : (
-        <p className="text-gray-500">No attendance records found.</p>
+        <div className="text-center text-gray-500 py-4">
+          No attendance records found
+        </div>
       )}
     </div>
   );
