@@ -15,7 +15,6 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { ModeToggle } from "@/components/ThemeSelector";
 import SignOutButton from "@/components/SignOutButton";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -212,7 +211,6 @@ const UserNavbar = () => {
           transition={{ delay: 0.2 }}
         >
           <div className="flex items-center justify-between gap-2">
-            <ModeToggle />
             <SignOutButton className="flex-1" />
           </div>
         </motion.div>
@@ -242,10 +240,6 @@ const UserNavbar = () => {
           >
             PharmaUser
           </motion.h1>
-
-          <div className="w-8">
-            <ModeToggle className="h-8 w-8" />
-          </div>
         </div>
       </motion.header>
 
