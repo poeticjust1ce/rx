@@ -1,6 +1,7 @@
 "use server";
 import prisma from "@/lib/prisma";
 import { auth } from "@/lib/auth";
+import { revalidatePath } from "next/cache";
 
 export async function getMyTeam() {
   const session = await auth();
@@ -25,7 +26,6 @@ export async function getAvailableUsers() {
   if (!session) throw new Error("Unauthorized");
 
   try {
-    // 1. First get ALL users from the database
     const allUsers = await prisma.user.findMany({
       select: {
         id: true,
@@ -38,7 +38,6 @@ export async function getAvailableUsers() {
 
     console.log("All users from DB:", allUsers);
 
-    // 2. Filter manually in JavaScript
     const availableUsers = allUsers.filter((user) => {
       const isRegularUser = user.role === "user";
       const hasNoManager =
@@ -69,38 +68,9 @@ export async function assignToTeam(userId) {
   });
 }
 
-export async function updateTeamMember(formData) {
+export async function removeFromTeam(userId) {
   const session = await auth();
   if (!session) throw new Error("Unauthorized");
-
-  const { id, name, role } = Object.fromEntries(formData);
-
-  const existingUser = await prisma.user.findFirst({
-    where: {
-      id,
-      managerId: session.user.id,
-    },
-  });
-
-  if (!existingUser) {
-    throw new Error("User not found in your team");
-  }
-
-  return await prisma.user.update({
-    where: { id },
-    data: {
-      name,
-      role,
-      updatedAt: new Date(),
-    },
-  });
-}
-
-export async function removeFromTeam(formData) {
-  const session = await auth();
-  if (!session) throw new Error("Unauthorized");
-
-  const userId = formData.get("userId");
 
   try {
     const user = await prisma.user.findUnique({
@@ -116,7 +86,7 @@ export async function removeFromTeam(formData) {
       where: { id: userId },
       data: { managerId: null },
     });
-
+    revalidatePath("/manager/team");
     return { success: true, message: "User removed from team successfully" };
   } catch (error) {
     console.error("Remove from team error:", error);

@@ -90,15 +90,13 @@ export const columns = [
               </DropdownMenuItem>
             </ViewDeliveriesModal>
 
-            <form action={handleRemove}>
-              <DropdownMenuItem
-                className="text-red-600 focus:text-red-600"
-                onSelect={(e) => e.preventDefault()}
-              >
-                <UserX className="mr-2 h-4 w-4" />
-                Remove from team
-              </DropdownMenuItem>
-            </form>
+            <DropdownMenuItem
+              className="text-red-600 focus:text-red-600"
+              onClick={handleRemove}
+            >
+              <UserX className="mr-2 h-4 w-4" />
+              Remove from team
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       );
