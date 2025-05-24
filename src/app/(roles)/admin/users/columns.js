@@ -17,7 +17,7 @@ import {
   SelectContent,
   SelectItem,
 } from "@/components/ui/select";
-import { deleteUser, toggleStatus, updateRole } from "./actions";
+import { deleteUser, toggleStatus, updateRole } from "./actions/actions";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
