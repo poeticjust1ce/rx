@@ -89,7 +89,7 @@ export default function CheckInOutButton({ userId }) {
       );
     } else {
       setIsLocationLoading(false);
-      setLocationName("Geolocation not supported");
+      setLocationName("Geolocation is not supported");
     }
   };
 
