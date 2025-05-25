@@ -9,7 +9,7 @@ const page = async () => {
   const [teamMembers, managerInventory, pendingTransfers] = await Promise.all([
     prisma.user.findMany({
       where: {
-        managerId: session?.user.id, // Only get users managed by this manager
+        managerId: session?.user.id,
       },
       include: {
         inventory: {

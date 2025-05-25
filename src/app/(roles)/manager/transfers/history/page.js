@@ -64,7 +64,7 @@ const TransfersPage = async ({ searchParams }) => {
           </p>
         </div>
         <Button asChild>
-          <Link href="/transfers/new">
+          <Link href="/manager/transfers">
             <ArrowLeftRight className="mr-2 h-4 w-4" />
             New Transfer
           </Link>

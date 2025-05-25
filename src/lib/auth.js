@@ -7,7 +7,6 @@ import NextAuth from "next-auth";
 
 import Credentials from "next-auth/providers/credentials";
 import { schema } from "./schema";
-import { use } from "react";
 
 const adapter = PrismaAdapter(prisma);
 

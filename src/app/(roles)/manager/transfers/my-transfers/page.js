@@ -1,7 +1,7 @@
 import { DataTable } from "@/components/table/DataTable";
 import { userTransferColumns } from "../../../user/transfers/userTransferColumns";
 import { getPendingTransfers } from "../../../user/transfers/_actions/actions";
-import { EmptyState } from "../../../user/transfers/_components/EmptyState";
+import { EmptyState } from "../components/EmptyState";
 
 export default async function UserTransfersPage() {
   const transfers = await getPendingTransfers();
