@@ -1,6 +1,7 @@
 "use client";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { toast } from "sonner";
 
 export function AttendanceStatsCards({ data }) {
   const stats = {
@@ -35,7 +36,15 @@ export function AttendanceStatsCards({ data }) {
           </div>
         </CardContent>
       </Card>
-      <Card>
+      <Card
+        onClick={() =>
+          toast("Employee 'Jeffrey Batumbakal' has checked in!", {
+            position: "top-center",
+            className: "bg-green-400 text-white",
+            duration: 5000,
+          })
+        }
+      >
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">Late Arrivals</CardTitle>
         </CardHeader>
