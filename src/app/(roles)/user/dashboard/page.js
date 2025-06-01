@@ -4,8 +4,7 @@ import { QuickActions } from "./_components/QuickActions";
 import { getUserDashboardData } from "./_actions/actions";
 
 export default async function UserDashboardPage() {
-  const { stats, recentTransfers, lowStockItems } =
-    await getUserDashboardData();
+  const { stats, recentTransfers } = await getUserDashboardData();
 
   return (
     <div className="container mx-auto p-4 space-y-6">
@@ -27,11 +26,6 @@ export default async function UserDashboardPage() {
           title="Pending Transfers"
           value={stats.pendingTransfers}
           icon="clock"
-        />
-        <CardStats
-          title="Recent Activity"
-          value={stats.recentActivity}
-          icon="activity"
         />
       </div>
 

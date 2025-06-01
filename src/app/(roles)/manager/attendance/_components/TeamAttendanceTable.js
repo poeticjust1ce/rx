@@ -1,10 +1,16 @@
-// src/app/(roles)/manager/attendance/_components/TeamAttendanceTable.jsx
 "use client";
 
-import { ColumnDef } from "@tanstack/react-table";
 import { DataTable } from "@/components/table/DataTable";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
+import { useState } from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogTrigger,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 
 export const columns = [
   {
@@ -44,6 +50,35 @@ export const columns = [
   {
     accessorKey: "location",
     header: "Location",
+  },
+  {
+    accessorKey: "photoUrl",
+    header: "Photo",
+    cell: ({ row }) => {
+      const [open, setOpen] = useState(false);
+      console.log(row.original);
+      return row.original.photoUrl ? (
+        <>
+          <Dialog open={open} onOpenChange={setOpen}>
+            <DialogTitle></DialogTitle>
+            <DialogTrigger asChild>
+              <Button variant="outline" size="sm">
+                View Photo
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="flex flex-col items-center">
+              <img
+                src={row.original.photoUrl}
+                alt="Attendance Proof"
+                className="w-full max-w-lg rounded-lg"
+              />
+            </DialogContent>
+          </Dialog>
+        </>
+      ) : (
+        "No Photo"
+      );
+    },
   },
 ];
 
