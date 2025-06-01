@@ -1,6 +1,5 @@
 "use client";
 
-import { ColumnDef } from "@tanstack/react-table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ArrowUpDown, MoreHorizontal } from "lucide-react";
@@ -89,8 +88,6 @@ export const userInventoryColumns = [
             >
               Copy item ID
             </DropdownMenuItem>
-            <DropdownMenuItem>View usage history</DropdownMenuItem>
-            <DropdownMenuItem>Request more</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       );
