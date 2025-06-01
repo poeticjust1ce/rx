@@ -1,4 +1,3 @@
-// src/app/(roles)/manager/attendance/_actions/actions.js
 "use server";
 import prisma from "@/lib/prisma";
 import { auth } from "@/lib/auth";
