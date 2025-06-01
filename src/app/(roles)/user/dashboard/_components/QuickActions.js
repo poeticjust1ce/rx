@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Plus, History, ClipboardList, TruckIcon } from "lucide-react";
+import { History, ClipboardList, TruckIcon, Package } from "lucide-react";
 import Link from "next/link";
 
 export function QuickActions() {
@@ -22,9 +22,9 @@ export function QuickActions() {
           </Link>
         </Button>
         <Button asChild variant="outline" className="h-24 flex-col gap-2">
-          <Link href="/user/transfers">
-            <Plus className="h-5 w-5" />
-            <span className="text-sm">New Request</span>
+          <Link href="/user/inventory">
+            <Package className="h-5 w-5" />
+            <span className="text-sm">Check Inventory</span>
           </Link>
         </Button>
         <Button asChild variant="outline" className="h-24 flex-col gap-2">
