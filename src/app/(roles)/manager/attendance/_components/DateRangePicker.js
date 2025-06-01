@@ -22,8 +22,8 @@ export function DateRangePicker() {
 
   const handleApply = () => {
     const params = new URLSearchParams();
-    if (date.from) params.set("from", date.from.toISOString());
-    if (date.to) params.set("to", date.to.toISOString());
+    if (date?.from) params.set("from", date.from.toISOString());
+    if (date?.to) params.set("to", date.to.toISOString());
     router.push(`?${params.toString()}`);
   };
 
@@ -33,7 +33,7 @@ export function DateRangePicker() {
         <PopoverTrigger asChild>
           <Button variant="outline">
             <CalendarIcon className="mr-2 h-4 w-4" />
-            {date.from ? (
+            {date?.from ? (
               date.to ? (
                 <>
                   {format(date.from, "LLL dd")} - {format(date.to, "LLL dd")}
@@ -56,7 +56,7 @@ export function DateRangePicker() {
         </PopoverContent>
       </Popover>
       <Button onClick={handleApply}>Apply</Button>
-      {date.from && (
+      {date?.from && (
         <Button
           variant="ghost"
           onClick={() => {
