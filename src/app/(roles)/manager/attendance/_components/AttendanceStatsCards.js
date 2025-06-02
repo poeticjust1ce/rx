@@ -37,7 +37,7 @@ export function AttendanceStatsCards({ data }) {
       </Card>
       <Card
         onClick={() => {
-          triggerNotification("Tangina niyong lahat");
+          triggerNotification("aydamo ka mark");
         }}
       >
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
