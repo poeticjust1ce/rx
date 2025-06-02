@@ -181,8 +181,8 @@ model Activity {
   type      String
   message   String
   timestamp DateTime @default(now())
-  userId    String   @db.ObjectId
-  user      User     @relation(fields: [userId], references: [id])
+  userId    String?  @db.ObjectId
+  user      User?    @relation(fields: [userId], references: [id])
 }
 
 model Delivery {
