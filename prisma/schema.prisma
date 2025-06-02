@@ -18,8 +18,8 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  managerId         String?      @db.ObjectId
-  activities        Activity[]
+  managerId String? @db.ObjectId
+
   team              User[]       @relation("ManagedUsers")
   sessions          Session[]
   accounts          Account[]
@@ -174,15 +174,6 @@ enum TransferStatus {
   pending
   accepted
   rejected
-}
-
-model Activity {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  type      String
-  message   String
-  timestamp DateTime @default(now())
-  userId    String   @db.ObjectId
-  user      User     @relation(fields: [userId], references: [id])
 }
 
 model Delivery {

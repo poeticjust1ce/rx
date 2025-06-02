@@ -23,7 +23,6 @@ export async function POST(request) {
       { status: 400 }
     );
   }
-  console.log({ res });
 
   try {
     const result = await prisma.user.create({
@@ -42,7 +41,7 @@ export async function POST(request) {
     });
 
     return NextResponse.json(
-      { message: "Account created successfully." },
+      { message: "Account created successfully.", res: result },
       { status: 200 }
     );
   } catch (e) {
