@@ -17,6 +17,7 @@ import {
   checkOutAttendance,
   getLatestAttendance,
 } from "../_actions/attendanceActions";
+import { triggerNotification } from "@/actions/notify";
 
 export default function CheckInOutButton({ userId }) {
   const [hasCheckedIn, setHasCheckedIn] = useState(false);

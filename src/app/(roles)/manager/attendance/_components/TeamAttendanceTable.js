@@ -56,7 +56,7 @@ export const columns = [
     header: "Photo",
     cell: ({ row }) => {
       const [open, setOpen] = useState(false);
-      console.log(row.original);
+
       return row.original.photoUrl ? (
         <>
           <Dialog open={open} onOpenChange={setOpen}>

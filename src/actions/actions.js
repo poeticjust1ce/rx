@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 import { z } from "zod";
 
 const transferSchema = z.object({
-  productId: z.string().min(1, "You should select a product"), // This is actually an InventoryItem ID
+  productId: z.string().min(1, "You should select a product"),
   senderId: z.string().min(1),
   receiverId: z.string().min(1),
   quantity: z.coerce.number().min(1, "Quantity must be at least 1"),
@@ -23,7 +23,6 @@ export async function Transfer(prevState, formData) {
 
   const { productId, senderId, receiverId, quantity, remarks } = result.data;
 
-  // ✅ 1. Find sender's inventory
   const senderInventory = await prisma.inventory.findFirst({
     where: { userId: senderId },
   });
@@ -32,11 +31,10 @@ export async function Transfer(prevState, formData) {
     return { error: "Sender has no inventory" };
   }
 
-  // ✅ 2. Find the product in sender's inventory
   const senderInventoryItem = await prisma.inventoryItem.findFirst({
     where: {
       inventoryId: senderInventory.id,
-      id: productId, // ✅ Correct way to find the item
+      id: productId,
     },
   });
 
@@ -44,13 +42,11 @@ export async function Transfer(prevState, formData) {
     return { error: "Insufficient stock" };
   }
 
-  // ✅ 3. Deduct from sender's inventory
   await prisma.inventoryItem.update({
     where: { id: senderInventoryItem.id },
     data: { quantity: senderInventoryItem.quantity - quantity },
   });
 
-  // ✅ 4. Find or create receiver's inventory
   let receiverInventory = await prisma.inventory.findFirst({
     where: { userId: receiverId },
   });
@@ -61,11 +57,10 @@ export async function Transfer(prevState, formData) {
     });
   }
 
-  // ✅ 5. Find or create receiver's inventory item
   let receiverInventoryItem = await prisma.inventoryItem.findFirst({
     where: {
       inventoryId: receiverInventory.id,
-      name: senderInventoryItem.name, // We match by product name because it's a different inventory
+      name: senderInventoryItem.name,
     },
   });
 
@@ -77,20 +72,19 @@ export async function Transfer(prevState, formData) {
   } else {
     await prisma.inventoryItem.create({
       data: {
-        name: senderInventoryItem.name, // ✅ Keep product name
-        inventoryId: receiverInventory.id, // ✅ Assign to receiver's inventory
+        name: senderInventoryItem.name,
+        inventoryId: receiverInventory.id,
         quantity,
-        batchNumber: senderInventoryItem.batchNumber, // ✅ Preserve batch info
-        expirationDate: senderInventoryItem.expirationDate, // ✅ Preserve expiration date
-        supplierId: senderInventoryItem.supplierId, // ✅ Keep supplier reference
+        batchNumber: senderInventoryItem.batchNumber,
+        expirationDate: senderInventoryItem.expirationDate,
+        supplierId: senderInventoryItem.supplierId,
       },
     });
   }
 
-  // ✅ 6. Record the transfer
   await prisma.transfer.create({
     data: {
-      productId, // This still refers to the InventoryItem ID
+      productId,
       senderId,
       receiverId,
       quantity,

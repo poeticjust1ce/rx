@@ -14,14 +14,12 @@ export async function checkIn(prevState, formData) {
   }
 
   try {
-    // Upload image to Vercel Blob Storage
     const imageBuffer = Buffer.from(image.split(",")[1], "base64");
     const blob = await put(`attendance/${Date.now()}.jpg`, imageBuffer, {
       access: "public",
       contentType: "image/jpeg",
     });
 
-    // Save attendance record in MongoDB
     await prisma.attendance.create({
       data: {
         userId,

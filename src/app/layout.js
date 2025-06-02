@@ -1,7 +1,7 @@
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "sonner";
-import { ThemeProvider } from "@/components/theme-provider";
+import NotificationListener from "@/components/NotificationListener";
 
 const font = Inter({
   weight: ["300", "400", "500", "600", "700"],
@@ -42,15 +42,14 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en" suppressHydrationWarning>
+      <NotificationListener />
       <body className={`${font.variable} font-sans antialiased`}>
-        <ThemeProvider attribute="class" defaultTheme="light">
-          <div className="flex min-h-screen">
-            <aside className="hidden lg:block w-64 bg-card shadow-md"></aside>
+        <div className="flex min-h-screen">
+          <aside className="hidden lg:block w-64 bg-card shadow-md"></aside>
 
-            <main className="flex-1 p-6">{children}</main>
-          </div>
-          <Toaster />
-        </ThemeProvider>
+          <main className="flex-1 p-6">{children}</main>
+        </div>
+        <Toaster position="top-right" richColors />
       </body>
     </html>
   );

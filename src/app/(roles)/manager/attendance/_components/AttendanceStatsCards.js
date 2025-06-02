@@ -1,7 +1,6 @@
 "use client";
-
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { toast } from "sonner";
+import { triggerNotification } from "@/actions/notify";
 
 export function AttendanceStatsCards({ data }) {
   const stats = {
@@ -37,13 +36,9 @@ export function AttendanceStatsCards({ data }) {
         </CardContent>
       </Card>
       <Card
-        onClick={() =>
-          toast("Employee 'Jeffrey Batumbakal' has checked in!", {
-            position: "top-center",
-            className: "bg-green-400 text-white",
-            duration: 5000,
-          })
-        }
+        onClick={() => {
+          triggerNotification("Tangina niyong lahat");
+        }}
       >
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">Late Arrivals</CardTitle>
