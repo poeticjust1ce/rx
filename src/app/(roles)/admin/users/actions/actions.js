@@ -72,7 +72,6 @@ export const getUsers = async () => {
         },
       },
     });
-    console.log("Fetched users:", users.length); // Debug logging
     return users;
   } catch (error) {
     console.error("Error fetching users:", error);

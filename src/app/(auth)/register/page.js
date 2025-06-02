@@ -13,13 +13,12 @@ import {
 } from "@/components/ui/card";
 import Link from "next/link";
 import { useState } from "react";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 import { z } from "zod";
 import { useRouter } from "next/navigation";
 import { User, Mail, Lock, Syringe } from "lucide-react";
 
 const page = () => {
-  const { toast } = useToast();
   const router = useRouter();
 
   const userSchema = z
@@ -85,26 +84,22 @@ const page = () => {
 
       if (!res.ok) {
         const errorData = await res.json();
-        toast({
-          title: errorData.message || "Something went wrong",
-          variant: "destructive",
-        });
+        toast.error(errorData.message || "Something went wrong!");
         setIsSubmitting(false);
         return;
       }
+      toast.success(
+        "Successfully created an account. Wait for an activation from the admin.",
+        { duration: 3000 }
+      );
 
-      router.push("/login");
-      toast({
-        title: "Successfully created an account",
-        variant: "success",
-      });
+      setTimeout(() => {
+        router.push("/login");
+      }, 1500);
     } catch (err) {
       setIsSubmitting(false);
       console.error(err);
-      toast({
-        title: "An unexpected error occurred",
-        variant: "destructive",
-      });
+      toast(err);
     }
   };
 

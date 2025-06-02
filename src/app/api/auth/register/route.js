@@ -3,6 +3,8 @@ import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 
 export async function POST(request) {
+  console.log("API HIT ⭐");
+
   const res = await request.json();
 
   const { name, email, password } = res;
@@ -17,7 +19,7 @@ export async function POST(request) {
 
   if (exists) {
     return NextResponse.json(
-      { error: "Email already exists" },
+      { message: "Email already exists" },
       { status: 400 }
     );
   }
@@ -39,8 +41,11 @@ export async function POST(request) {
       },
     });
 
-    return NextResponse.json({ result }, { status: 200 });
+    return NextResponse.json(
+      { message: "Account created successfully." },
+      { status: 200 }
+    );
   } catch (e) {
-    return NextResponse.json({ error: e }, { status: 400 });
+    return NextResponse.json({ message: e.message }, { status: 400 });
   }
 }
