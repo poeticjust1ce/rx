@@ -31,8 +31,6 @@ const activityIcons = {
 
 export default async function ManagerDashboardPage() {
   const session = await auth();
-
-  // Parallel data fetching for manager-specific data
   const [teamMembers, inventory, recentTransfers, activities, attendanceData] =
     await Promise.all([
       prisma.user.findMany({
@@ -76,7 +74,6 @@ export default async function ManagerDashboardPage() {
       }),
     ]);
 
-  // Calculate stats
   const presentToday = attendanceData.filter((a) => a.timeOut === null).length;
   const lowStockItems =
     inventory?.items.filter((i) => i.quantity < 5).length || 0;
