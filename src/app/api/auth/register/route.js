@@ -37,6 +37,11 @@ export async function POST(request) {
       data: {
         type: "User",
         message: `New user ${name} registered`,
+        user: {
+          connect: {
+            id: result.id,
+          },
+        },
       },
     });
 
