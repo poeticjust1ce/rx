@@ -1,4 +1,3 @@
-// app/(roles)/admin/inventory/_components/ProductForm.js
 "use client";
 
 import { Button } from "@/components/ui/button";
@@ -19,7 +18,7 @@ import { addProduct, editProduct } from "../_actions/actions";
 import { useEffect, useRef } from "react";
 import { Badge } from "@/components/ui/badge";
 
-const ProductForm = ({ suppliers, onSuccess, editData }) => {
+export default function ProductForm({ suppliers, onSuccess, editData }) {
   const formRef = useRef();
   const isEditMode = Boolean(editData?.id);
   const [error, action] = useActionState(
@@ -125,7 +124,7 @@ const ProductForm = ({ suppliers, onSuccess, editData }) => {
       <SubmitButton isEdit={isEditMode} />
     </form>
   );
-};
+}
 
 function SubmitButton({ isEdit }) {
   const { pending } = useFormStatus();
@@ -135,5 +134,3 @@ function SubmitButton({ isEdit }) {
     </Button>
   );
 }
-
-export default ProductForm;

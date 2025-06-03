@@ -43,7 +43,6 @@ export function EmployeeInventoryDashboard({ users = [], currentInventory }) {
   const [isTransferOpen, setIsTransferOpen] = useState(false);
   const tableContainerRef = useRef(null);
 
-  // Memoize filtered data
   const selectedUser = useMemo(
     () => users.find((user) => user.id === selectedUserId),
     [users, selectedUserId]
@@ -71,7 +70,6 @@ export function EmployeeInventoryDashboard({ users = [], currentInventory }) {
           title: `Transfer ${action}ed`,
           description: `Transfer has been ${action}ed successfully`,
         });
-        // Refresh data or update state as needed
       } else {
         throw new Error(result.error);
       }
@@ -88,18 +86,17 @@ export function EmployeeInventoryDashboard({ users = [], currentInventory }) {
     data: filteredItems,
     columns,
     getCoreRowModel: getCoreRowModel(),
-    // Add this:
+
     defaultColumn: {
-      size: 150, // Default column width
-      minSize: 50, // Minimum column width
+      size: 150,
+      minSize: 50,
     },
   });
 
-  // Virtualization setup
   const { rows } = table.getRowModel();
   const rowVirtualizer = useVirtualizer({
     count: rows.length,
-    estimateSize: () => 48, // Average row height
+    estimateSize: () => 48,
     getScrollElement: () => tableContainerRef.current,
     overscan: 10,
   });
@@ -276,7 +273,7 @@ export function EmployeeInventoryDashboard({ users = [], currentInventory }) {
                               <TableCell
                                 key={cell.id}
                                 style={{
-                                  width: cell.column.getSize(), // Match header width
+                                  width: cell.column.getSize(),
                                 }}
                               >
                                 {flexRender(

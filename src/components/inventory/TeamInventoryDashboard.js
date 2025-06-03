@@ -92,7 +92,6 @@ export function TeamInventoryDashboard({ teamMembers = [], managerInventory }) {
     },
   });
 
-  // Virtualization setup
   const { rows } = table.getRowModel();
   const rowVirtualizer = useVirtualizer({
     count: rows.length,
