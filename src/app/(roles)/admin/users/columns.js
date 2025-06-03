@@ -10,7 +10,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { toast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 import {
   Select,
   SelectTrigger,
@@ -68,16 +68,9 @@ export const columns = [
         setIsUpdating(true);
         try {
           await updateRole(user.id, role);
-          toast({
-            title: "Role updated",
-            description: `${user.name}'s role has been updated to ${role}`,
-          });
+          toast.success("Role updated!");
         } catch (error) {
-          toast({
-            title: "Error",
-            description: "Failed to update role",
-            variant: "destructive",
-          });
+          toast.error("Error updating role");
         } finally {
           setIsUpdating(false);
         }
@@ -134,16 +127,9 @@ export const columns = [
         setIsDeleting(true);
         try {
           await deleteUser(user.id);
-          toast({
-            title: "User deleted",
-            description: `${user.name} has been removed from the system`,
-          });
+          toast("User deleted successfully");
         } catch (error) {
-          toast({
-            title: "Error",
-            description: "Failed to delete user",
-            variant: "destructive",
-          });
+          toast("Failed to delete user");
         } finally {
           setIsDeleting(false);
         }
@@ -153,18 +139,9 @@ export const columns = [
         setIsToggling(true);
         try {
           await toggleStatus(user.id);
-          toast({
-            title: "Status updated",
-            description: `${user.name}'s account has been ${
-              user.isActivated ? "deactivated" : "activated"
-            }`,
-          });
+          toast.success("User account status updated");
         } catch (error) {
-          toast({
-            title: "Error",
-            description: "Failed to update status",
-            variant: "destructive",
-          });
+          toast.error("Failed to activate user");
         } finally {
           setIsToggling(false);
         }

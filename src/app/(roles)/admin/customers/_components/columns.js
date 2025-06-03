@@ -9,7 +9,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { deleteCustomer } from "../_actions/actions";
-import { toast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 
 export const columns = [
   {
@@ -28,16 +28,10 @@ export const columns = [
       const handleDelete = async (id) => {
         try {
           await deleteCustomer(id);
-          toast({
-            title: "Customer deleted successfully",
-          });
+          toast("Customer deleted successfully");
           window.location.reload();
         } catch (error) {
-          toast({
-            title: "Error deleting customer",
-            description: error.message,
-            variant: "destructive",
-          });
+          toast.error("Error deleting customer");
         }
       };
 

@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/dialog";
 import CustomerForm from "./CustomerForm";
 import { createCustomer } from "../_actions/actions";
-import { toast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 
 export default function AddCustomerModal() {
   const [isOpen, setIsOpen] = useState(false);
@@ -20,13 +20,10 @@ export default function AddCustomerModal() {
     try {
       await createCustomer(formData);
       setIsOpen(false);
+      toast.success("Customer added successfully");
       window.location.reload();
     } catch (error) {
-      toast({
-        title: "Error creating customer",
-        description: error.message,
-        variant: "destructive",
-      });
+      toast.error("Error adding customer");
     }
   };
 

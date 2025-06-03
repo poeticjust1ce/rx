@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/dialog";
 import CustomerForm from "./CustomerForm";
 import { createCustomer } from "../_actions/actions";
-import { toast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 
 export default function AddCustomerButton() {
   const [isOpen, setIsOpen] = useState(false);
@@ -31,14 +31,11 @@ export default function AddCustomerButton() {
             action={async (formData) => {
               const result = await createCustomer(formData);
               if (result?.success) {
+                toast.success("Customer added successfully");
                 setIsOpen(false);
                 window.location.reload();
               } else if (result?.error) {
-                toast({
-                  title: "Error creating customer",
-                  description: Object.values(result.error).join(", "),
-                  variant: "destructive",
-                });
+                toast.error("Can't add customer");
               }
               return result;
             }}

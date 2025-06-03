@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/dialog";
 import CustomerForm from "./CustomerForm";
 import { editCustomer } from "../_actions/actions";
-import { toast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 
 export default function EditCustomerModal({ customer }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -18,13 +18,10 @@ export default function EditCustomerModal({ customer }) {
     try {
       await editCustomer(customer.id, formData);
       setIsOpen(false);
+      toast.success("Customer updated successfully");
       window.location.reload();
     } catch (error) {
-      toast({
-        title: "Error updating customer",
-        description: error.message,
-        variant: "destructive",
-      });
+      toast.error("Error updating customer");
     }
   };
 

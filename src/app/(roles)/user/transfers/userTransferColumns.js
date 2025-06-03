@@ -1,12 +1,10 @@
 "use client";
 
-import { ColumnDef } from "@tanstack/react-table";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { approveTransfer, rejectTransfer } from "./_actions/actions";
 import { useRouter } from "next/navigation";
-import { toast } from "@/hooks/use-toast";
-import { Clock, Check, X } from "lucide-react";
+import { toast } from "sonner";
+import { Check, X } from "lucide-react";
 
 export const userTransferColumns = [
   {
@@ -58,20 +56,15 @@ export const userTransferColumns = [
               : await rejectTransfer(transfer.id);
 
           if (result.success) {
-            toast({
-              title: `Transfer ${action}d`,
-              description: `You've ${action}d the transfer of ${transfer.product.name}`,
-            });
+            toast.success(
+              `You've ${action}d the transfer of ${transfer.product.name}`
+            );
             router.refresh();
           } else {
             throw new Error(result.error);
           }
         } catch (error) {
-          toast({
-            title: "Action failed",
-            description: error.message,
-            variant: "destructive",
-          });
+          toast("Action failed");
         }
       };
 

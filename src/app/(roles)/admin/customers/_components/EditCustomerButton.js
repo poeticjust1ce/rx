@@ -9,12 +9,11 @@ import {
 } from "@/components/ui/dialog";
 import CustomerForm from "./CustomerForm";
 import { editCustomer } from "../_actions/actions";
-import { toast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 
 export default function EditCustomerButton({ customer }) {
   const [isOpen, setIsOpen] = useState(false);
 
-  // This makes the button available to be clicked programmatically
   return (
     <>
       <button
@@ -33,14 +32,11 @@ export default function EditCustomerButton({ customer }) {
             action={async (formData) => {
               const result = await editCustomer(customer.id, formData);
               if (result?.success) {
+                toast.success("Edited the customer successfully");
                 setIsOpen(false);
                 window.location.reload();
               } else if (result?.error) {
-                toast({
-                  title: "Error updating customer",
-                  description: Object.values(result.error).join(", "),
-                  variant: "destructive",
-                });
+                toast.error("Error updating customer");
               }
               return result;
             }}
