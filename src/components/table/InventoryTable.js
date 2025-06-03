@@ -9,6 +9,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { PackageSearch } from "lucide-react";
 
 export function InventoryTable({ columns, data }) {
   return (
