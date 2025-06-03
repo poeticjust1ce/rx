@@ -11,11 +11,7 @@ export const getColumns = (setEditingProduct, setIsDialogOpen, refreshData) => [
     accessorKey: "name",
     header: "Product",
     cell: ({ row }) => (
-      <div className="font-medium text-xs sm:text-sm">
-        {row.original.name.length > 15
-          ? `${row.original.name.substring(0, 15)}...`
-          : row.original.name}
-      </div>
+      <div className="font-medium text-xs sm:text-sm">{row.original.name}</div>
     ),
   },
   {
@@ -31,11 +27,7 @@ export const getColumns = (setEditingProduct, setIsDialogOpen, refreshData) => [
     header: "Supplier",
     cell: ({ row }) => (
       <div className="text-xs sm:text-sm">
-        {row.original.supplier?.name
-          ? row.original.supplier.name.length > 10
-            ? `${row.original.supplier.name.substring(0, 10)}...`
-            : row.original.supplier.name
-          : "N/A"}
+        {row.original.supplier.name || "N/A"}
       </div>
     ),
   },
@@ -45,9 +37,7 @@ export const getColumns = (setEditingProduct, setIsDialogOpen, refreshData) => [
     header: "Batch",
     cell: ({ row }) => (
       <div className="text-xs sm:text-sm font-mono">
-        {row.original.batchNumber.length > 8
-          ? `${row.original.batchNumber.substring(0, 8)}...`
-          : row.original.batchNumber}
+        {row.original.batchNumber}
       </div>
     ),
   },
