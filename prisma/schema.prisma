@@ -53,8 +53,8 @@ model Inventory {
   id String @id @default(auto()) @map("_id") @db.ObjectId
 
   // owner of inventory
-  userId String @unique @db.ObjectId
-  user   User   @relation(fields: [userId], references: [id])
+  userId String? @unique @db.ObjectId
+  user   User?   @relation(fields: [userId], references: [id])
   //
 
   isAdminInventory Boolean @default(false)
@@ -118,13 +118,13 @@ model Attendance {
 
   // relations
 
-  userId String @db.ObjectId
-  user   User   @relation(fields: [userId], references: [id])
+  userId String? @db.ObjectId
+  user   User?   @relation(fields: [userId], references: [id])
 }
 
 model Account {
   id                String  @id @default(auto()) @map("_id") @db.ObjectId
-  userId            String  @db.ObjectId
+  userId            String? @db.ObjectId
   type              String
   provider          String
   providerAccountId String
@@ -139,7 +139,7 @@ model Account {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User? @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
 }
@@ -147,9 +147,9 @@ model Account {
 model Session {
   id           String   @id @default(auto()) @map("_id") @db.ObjectId
   sessionToken String   @unique
-  userId       String   @db.ObjectId
+  userId       String?  @db.ObjectId
   expires      DateTime
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user         User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -195,11 +195,11 @@ model Delivery {
   updatedAt     DateTime @updatedAt
 
   // Relations
-  customerId  String         @db.ObjectId
-  customer    Customer       @relation(fields: [customerId], references: [id])
+  customerId  String?        @db.ObjectId
+  customer    Customer?      @relation(fields: [customerId], references: [id])
   items       DeliveryItem[]
-  deliveredBy String         @db.ObjectId
-  user        User           @relation(fields: [deliveredBy], references: [id])
+  deliveredBy String?        @db.ObjectId
+  user        User?          @relation(fields: [deliveredBy], references: [id])
 }
 
 model DeliveryItem {
@@ -210,9 +210,9 @@ model DeliveryItem {
   updatedAt DateTime @updatedAt
 
   // Relations
-  delivery   Delivery @relation(fields: [deliveryId], references: [id])
-  deliveryId String   @db.ObjectId
+  delivery   Delivery? @relation(fields: [deliveryId], references: [id])
+  deliveryId String?   @db.ObjectId
 
-  product   InventoryItem @relation(fields: [productId], references: [id])
-  productId String        @db.ObjectId
+  product   InventoryItem? @relation(fields: [productId], references: [id])
+  productId String?        @db.ObjectId
 }
