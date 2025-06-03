@@ -60,7 +60,6 @@ export default function InventoryPage() {
 
   return (
     <div className="px-2 sm:px-4 py-4 w-full overflow-x-hidden">
-      {/* Header Section */}
       <div className="flex flex-col gap-3 mb-4">
         <div>
           <h1 className="text-2xl sm:text-3xl font-bold">Inventory</h1>
@@ -117,7 +116,6 @@ export default function InventoryPage() {
         </div>
       </div>
 
-      {/* Table Container */}
       <div className="rounded-lg border overflow-hidden">
         <div className="overflow-x-auto">
           <InventoryTable

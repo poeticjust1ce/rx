@@ -1,12 +1,10 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { redirect } from "next/navigation";
 import prisma from "@/lib/prisma";
 import { auth } from "@/lib/auth";
 import { z } from "zod";
 
-// Schema definition (no export needed)
 const productSchema = z.object({
   name: z.string().min(1, "Product name is required"),
   quantity: z.coerce.number().min(1, "Quantity must be greater than 0"),
@@ -15,22 +13,6 @@ const productSchema = z.object({
   expirationDate: z.string().min(1, "Expiration date is required"),
 });
 
-// Helper function
-async function getOrCreateAdminInventory() {
-  let inventory = await prisma.inventory.findFirst({
-    where: { isAdminInventory: true },
-  });
-
-  if (!inventory) {
-    inventory = await prisma.inventory.create({
-      data: { isAdminInventory: true },
-    });
-  }
-
-  return inventory;
-}
-
-// Server Actions
 export async function getInventoryItems() {
   try {
     const inventory = await prisma.inventory.findFirst({
@@ -59,7 +41,7 @@ export async function getSuppliers() {
   }
 }
 
-export async function addProduct(formData) {
+export async function addProduct(id, formData) {
   const result = productSchema.safeParse(
     Object.fromEntries(formData.entries())
   );
@@ -69,7 +51,8 @@ export async function addProduct(formData) {
   }
 
   const data = result.data;
-  const inventory = await getOrCreateAdminInventory();
+
+  const inventory = await getInventoryForCurrentUser();
 
   await prisma.inventoryItem.create({
     data: { ...data, inventoryId: inventory.id },
@@ -79,7 +62,7 @@ export async function addProduct(formData) {
   return { success: true };
 }
 
-export async function editProduct(id, formData) {
+export async function editProduct(id, prevState, formData) {
   const result = productSchema.safeParse(
     Object.fromEntries(formData.entries())
   );
@@ -113,7 +96,6 @@ export async function transferInventoryItem({
       throw new Error("Unauthorized - Please log in");
     }
 
-    // Validate inputs
     if (!productId || !receiverId || !quantity) {
       throw new Error("Missing required fields");
     }
@@ -121,7 +103,6 @@ export async function transferInventoryItem({
       throw new Error("Quantity must be positive");
     }
 
-    // Check if receiver has an inventory, create if not
     let receiverInventory =
       (await prisma.inventory.findUnique({
         where: { userId: receiverId },
@@ -130,7 +111,6 @@ export async function transferInventoryItem({
         data: { userId: receiverId },
       }));
 
-    // Create the transfer record
     const transfer = await prisma.transfer.create({
       data: {
         productId,
@@ -222,15 +202,12 @@ export async function completeTransfer({ transferId, action }) {
           },
         });
       }
-
-      // Deduct from sender's inventory
       await prisma.inventoryItem.update({
         where: { id: transfer.productId },
         data: { quantity: { decrement: transfer.quantity } },
       });
     }
 
-    // Update transfer status
     await prisma.transfer.update({
       where: { id: transferId },
       data: { status: action === "accept" ? "accepted" : "rejected" },
@@ -241,5 +218,43 @@ export async function completeTransfer({ transferId, action }) {
   } catch (error) {
     console.error("Transfer completion failed:", error);
     return { success: false, error: error.message };
+  }
+}
+
+async function getInventoryForCurrentUser() {
+  const session = await auth();
+
+  if (!session?.user) {
+    throw new Error("Unauthorized - Please log in");
+  }
+
+  const userId = session.user.id;
+  const userRole = session.user.role;
+
+  if (userRole === "admin") {
+    let inventory = await prisma.inventory.findFirst({
+      where: { isAdminInventory: true },
+    });
+
+    if (!inventory) {
+      inventory = await prisma.inventory.create({
+        data: { isAdminInventory: true },
+      });
+    }
+    return inventory;
+  } else {
+    let inventory = await prisma.inventory.findUnique({
+      where: { userId },
+    });
+
+    if (!inventory) {
+      inventory = await prisma.inventory.create({
+        data: {
+          user: { connect: { id: userId } },
+          isAdminInventory: false,
+        },
+      });
+    }
+    return inventory;
   }
 }

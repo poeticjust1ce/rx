@@ -74,10 +74,10 @@ model InventoryItem {
   transfer       Transfer[]
 
   // relations
-  inventoryId String    @db.ObjectId
-  inventory   Inventory @relation(fields: [inventoryId], references: [id])
-  supplierId  String    @db.ObjectId
-  supplier    Supplier  @relation(fields: [supplierId], references: [id])
+  inventoryId String?    @db.ObjectId
+  inventory   Inventory? @relation(fields: [inventoryId], references: [id])
+  supplierId  String?    @db.ObjectId
+  supplier    Supplier?  @relation(fields: [supplierId], references: [id])
 
   createdAt    DateTime       @default(now())
   updatedAt    DateTime       @updatedAt
