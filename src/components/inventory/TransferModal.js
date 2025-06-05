@@ -79,7 +79,7 @@ export function TransferModal({
         `Transferred ${values.quantity} ${selectedProduct?.name} to ${receiver.name}`
       );
 
-      onSuccess(); // Close modal and refresh data
+      onSuccess();
     } catch (error) {
       console.error("Transfer error:", error);
       toast.error("Transfer failed");

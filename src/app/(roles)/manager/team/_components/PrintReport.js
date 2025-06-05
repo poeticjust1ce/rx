@@ -52,7 +52,6 @@ export function PrintReport({ report }) {
         </html>
       `);
     } else {
-      // Delivery report template
       printWindow.document.write(`
         <html>
           <head>
@@ -94,6 +93,8 @@ export function PrintReport({ report }) {
                     </ul>
                   </td>
                   <td>${delivery.orNumber || "N/A"}</td>
+                  <td>${delivery.invoiceNumber || "N/A"}</td>
+                  ${console.log(delivery)}
                 </tr>
               `
                 )

@@ -32,26 +32,41 @@ import { Loader2 } from "lucide-react";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-const formSchema = z.object({
-  customerId: z.string().min(1, "Customer is required"),
-  deliveryDate: z.string().min(1, "Date is required"),
-  orNumber: z.string().min(1, "OR Number is required"),
-  invoiceNumber: z.string().optional(),
-  remarks: z.string().optional(),
-  items: z
-    .array(
-      z.object({
-        productId: z.string().min(1, "Product is required"),
-        quantity: z.number().min(1, "Quantity must be at least 1"),
-        notes: z.string().optional(),
-      })
-    )
-    .min(1, "At least one item is required"),
-});
-
 export default function LogDeliveryModal({ customers, products }) {
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+
+  const formSchema = z
+    .object({
+      customerId: z.string().min(1, "Customer is required"),
+      deliveryDate: z.string().min(1, "Date is required"),
+      orNumber: z.string().min(1, "OR Number is required"),
+      invoiceNumber: z.string().optional(),
+      remarks: z.string().optional(),
+      items: z
+        .array(
+          z.object({
+            productId: z.string().min(1, "Product is required"),
+            quantity: z
+              .number({ invalid_type_error: "Quantity is required" })
+              .min(1, "Quantity must be at least 1"),
+            notes: z.string().optional(),
+          })
+        )
+        .min(1, "At least one item is required"),
+    })
+    .superRefine((data, ctx) => {
+      data.items.forEach((item, index) => {
+        const product = products.find((p) => p.id === item.productId);
+        if (product && item.quantity > product.quantity) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: `Quantity exceeds available stock (${product.quantity})`,
+            path: ["items", index, "quantity"],
+          });
+        }
+      });
+    });
 
   const form = useForm({
     resolver: zodResolver(formSchema),
@@ -208,7 +223,7 @@ export default function LogDeliveryModal({ customers, products }) {
                 {fields.map((field, index) => (
                   <div
                     key={field.id}
-                    className="grid grid-cols-12 gap-2 items-end"
+                    className="grid grid-cols-12 gap-2 items-start"
                   >
                     <div className="col-span-5">
                       <FormLabel>Product *</FormLabel>
@@ -237,22 +252,28 @@ export default function LogDeliveryModal({ customers, products }) {
                       />
                     </div>
                     <div className="col-span-2">
-                      <FormLabel>Qty *</FormLabel>
                       <FormField
                         control={form.control}
                         name={`items.${index}.quantity`}
                         render={({ field }) => (
-                          <Input
-                            type="number"
-                            min="1"
-                            {...field}
-                            onChange={(e) =>
-                              field.onChange(parseInt(e.target.value))
-                            }
-                          />
+                          <FormItem className="space-y-1">
+                            <FormLabel>Qty *</FormLabel>
+                            <FormControl>
+                              <Input
+                                type="number"
+                                min="1"
+                                {...field}
+                                onChange={(e) =>
+                                  field.onChange(parseInt(e.target.value))
+                                }
+                              />
+                            </FormControl>
+                            <FormMessage className="min-h-[20px]" />{" "}
+                          </FormItem>
                         )}
                       />
                     </div>
+
                     <div className="col-span-4">
                       <FormLabel>Item Notes</FormLabel>
                       <FormField
