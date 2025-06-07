@@ -149,15 +149,19 @@ export default function LogDeliveryModal({ customers, products }) {
                 <FormField
                   control={form.control}
                   name="deliveryDate"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Delivery Date *</FormLabel>
-                      <FormControl>
-                        <Input type="date" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
+                  render={({ field }) => {
+                    const today = new Date().toISOString().split("T")[0];
+
+                    return (
+                      <FormItem>
+                        <FormLabel>Delivery Date *</FormLabel>
+                        <FormControl>
+                          <Input type="date" min={today} {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    );
+                  }}
                 />
                 <FormField
                   control={form.control}
