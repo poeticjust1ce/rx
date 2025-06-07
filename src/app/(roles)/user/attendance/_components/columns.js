@@ -10,6 +10,7 @@ import {
 
 import moment from "moment-timezone";
 import { Button } from "@/components/ui/button";
+import { formatDuration, intervalToDuration } from "date-fns";
 
 export const columns = [
   {
@@ -29,6 +30,23 @@ export const columns = [
       row.original.timeOut
         ? moment(row.original.timeOut).format("hh:mm A")
         : "🚨 Still Checked In",
+  },
+  {
+    accessorKey: "duration",
+    header: "Total Time",
+    cell: ({ row }) => {
+      const timeIn = new Date(row.original.timeIn);
+      const timeOut = row.original.timeOut
+        ? new Date(row.original.timeOut)
+        : null;
+
+      if (!timeOut) return <Badge variant="secondary">Ongoing</Badge>;
+
+      const duration = intervalToDuration({ start: timeIn, end: timeOut });
+      return formatDuration(duration, {
+        format: ["hours", "minutes", "seconds"],
+      });
+    },
   },
   {
     accessorKey: "location",

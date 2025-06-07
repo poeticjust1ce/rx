@@ -34,14 +34,14 @@ export function AttendanceStatsCards({ data }) {
           </div>
         </CardContent>
       </Card>
-      <Card>
+      {/* <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">Late Arrivals</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold text-amber-500">{stats.late}</div>
         </CardContent>
-      </Card>
+      </Card> */}
     </div>
   );
 }

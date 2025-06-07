@@ -2,7 +2,7 @@
 
 import { DataTable } from "@/components/table/DataTable";
 import { Badge } from "@/components/ui/badge";
-import { format } from "date-fns";
+
 import { useState } from "react";
 import {
   Dialog,
@@ -11,6 +11,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { format, intervalToDuration, formatDuration } from "date-fns";
 
 export const columns = [
   {
@@ -33,20 +34,23 @@ export const columns = [
       ),
   },
   {
-    accessorKey: "status",
-    header: "Status",
+    accessorKey: "duration",
+    header: "Total Time",
     cell: ({ row }) => {
-      const timeIn = new Date(row.getValue("timeIn"));
-      const isLate =
-        timeIn.getHours() > 9 ||
-        (timeIn.getHours() === 9 && timeIn.getMinutes() > 0);
-      return isLate ? (
-        <Badge variant="destructive">Late</Badge>
-      ) : (
-        <Badge variant="default">On time</Badge>
-      );
+      const timeIn = new Date(row.original.timeIn);
+      const timeOut = row.original.timeOut
+        ? new Date(row.original.timeOut)
+        : null;
+
+      if (!timeOut) return <Badge variant="secondary">Ongoing</Badge>;
+
+      const duration = intervalToDuration({ start: timeIn, end: timeOut });
+      return formatDuration(duration, {
+        format: ["hours", "minutes", "seconds"],
+      });
     },
   },
+
   {
     accessorKey: "location",
     header: "Location",
